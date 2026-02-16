@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>AdMarket - Рекламная платформа</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ static_v }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/blogger-channels.css') }}?v={{ static_v }}">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="page-blur-overlay" id="page-blur-overlay"></div>
+    <div class="app-container">
+        <!-- Buy Page (Main) -->
+        <div class="page active" id="buy-page">
+            <!-- Balance pill in top-right corner (same as profile) -->
+            <div class="balance-pill balance-pill-buy">
+                <span class="balance-amount">
+                    <span id="user-balance-buy">0</span>
+                    <img src="/static/pic/free-icon-ruble-12718476.png" alt="₽" class="balance-ruble-icon">
+                </span>
+                <button class="balance-add-btn" type="button" onclick="openBalanceTopupModal()">
+                    <i data-lucide="plus"></i>
+                </button>
+            </div>
+            
+            <div class="search-section">
+                <!-- Become Blogger Banner -->
+                <div class="buy-page-blogger-banner" onclick="handleBloggerLinkClick()">
+                    <img src="/static/pic/стать-блогером2.png" alt="Стать блогером" class="buy-page-banner-img">
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" placeholder="Поиск блогеров..." id="search-input">
+                    <i data-lucide="search" class="search-icon"></i>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">
+                        <i data-lucide="grid-3x3"></i>
+                        Все
+                    </button>
+                    <button class="filter-btn" data-filter="popular">
+                        <i data-lucide="trending-up"></i>
+                        Популярные
+                    </button>
+                    <button class="filter-btn" data-filter="price">
+                        <img src="/static/pic/free-icon-ruble-2769409.png" class="filter-icon" alt="">
+                        По цене
+                    </button>
+                    <button class="filter-btn topic-filter-btn" id="topic-filter-btn">
+                        <img src="/static/pic/free-icon-paper-3597109.png" class="filter-icon topic-icon" alt="Тематики">
+                    </button>
+                </div>
+                
+                <!-- Topics Dropdown Menu -->
+                <div class="topics-dropdown" id="topics-dropdown">
+                    <div class="topics-dropdown-overlay" id="topics-dropdown-overlay"></div>
+                    <div class="topics-menu" id="topics-menu">
+                        <!-- Topics will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="bloggers-feed" id="bloggers-feed">
+                <!-- Bloggers will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page" id="profile-page">
+            <div class="profile-header">
+                <button class="settings-btn" onclick="openSettingsModal()">
+                    <img src="/static/pic/free-icon-setting-3178130.png" alt="Settings">
+                </button>
+                
+                <!-- Balance pill in top-right corner -->
+                <div class="balance-pill">
+                    <span class="balance-amount">
+                        <span id="user-balance">0</span>
+                        <img src="/static/pic/free-icon-ruble-12718476.png" alt="₽" class="balance-ruble-icon">
+                    </span>
+                    <button class="balance-add-btn" type="button" onclick="openBalanceTopupModal()">
+                        <i data-lucide="plus"></i>
+                    </button>
+                </div>
+                
+                <div class="profile-top-section">
+                    <div class="avatar-wrapper">
+                        <img id="user-avatar" src="" alt="Avatar" class="user-avatar">
+                        <div class="avatar-skeleton"></div>
+                    </div>
+                    <h1 class="user-name" id="user-name">
+                        <div class="skeleton-text"></div>
+                    </h1>
+                    <p class="user-username" id="user-username"></p>
+                </div>
+                
+                <div class="profile-stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value-grid" id="total-orders">0</div>
+                        <div class="stat-label-grid">Заказов</div>
+                    </div>
+                    <div class="stats-divider"></div>
+                    <div class="stat-box">
+                        <div class="stat-value-grid" id="total-spent">
+                            <span class="stat-amount">0</span>
+                            <img src="/static/pic/free-icon-ruble-12718476.png" alt="₽" class="ruble-icon">
+                        </div>
+                        <div class="stat-label-grid">Потрачено</div>
+                    </div>
+                </div>
+                
+                <div class="become-blogger-link" id="blogger-link" onclick="handleBloggerLinkClick()">
+                    <img src="/static/pic/стать-блогером2.png" alt="Стать блогером MEDIA PRIME" class="become-blogger-banner-img">
+                </div>
+            </div>
+
+            <div class="profile-sections">
+                <div class="square-buttons-grid">
+                    <button class="square-btn" onclick="openOrdersModal()">
+                        <span class="square-btn-title">История</span>
+                        <div class="square-btn-arrow">
+                            <i data-lucide="arrow-right"></i>
+                        </div>
+                    </button>
+
+                    <button class="square-btn" onclick="openActiveAdsModal()">
+                        <span class="square-btn-title">Реклама</span>
+                        <div class="square-btn-arrow">
+                            <i data-lucide="arrow-right"></i>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Blogger Channels Section -->
+                <div class="profile-channels-section" id="profile-channels-section" style="display: none;">
+                    <div class="profile-channels-feed" id="profile-channels-feed">
+                        <!-- Channel cards will be loaded here dynamically -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Offer Page -->
+        <div class="page" id="offer-page">
+            <div class="search-section">
+                <!-- Top: primary action instead of search -->
+                <div class="offer-add-wrapper">
+                    <button 
+                        class="btn-primary offer-add-btn" 
+                        type="button"
+                        onclick="handleAddOfferClick()"
+                    >
+                        <i data-lucide="plus"></i>
+                        <span>Добавить предложение</span>
+                    </button>
+                </div>
+
+                <!-- Filters: без сортировки «Популярные» на странице Offer -->
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">
+                        <i data-lucide="grid-3x3"></i>
+                        Все
+                    </button>
+                    <button class="filter-btn" data-filter="price">
+                        <img src="/static/pic/free-icon-ruble-2769409.png" class="filter-icon" alt="">
+                        По цене
+                    </button>
+                </div>
+            </div>
+
+            <div class="offers-feed" id="offers-feed">
+                <!-- Offer cards will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- FAQ Page -->
+        <div class="page" id="faq-page">
+            <div class="page-header">
+                <h2>FAQ</h2>
+                <p class="page-subtitle">Часто задаваемые вопросы</p>
+            </div>
+            
+            <div class="howto-content">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Найдите блогера</h3>
+                        <p>Используйте поиск и фильтры в разделе "Купить", чтобы найти подходящих блогеров для вашей рекламы</p>
+                        <div class="step-icon">
+                            <i data-lucide="search"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Выберите формат</h3>
+                        <p>Определите тип рекламы: пост, история, видео или интеграция. Каждый формат имеет свою стоимость</p>
+                        <div class="step-icon">
+                            <i data-lucide="image"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Забронируйте дату</h3>
+                        <p>Выберите удобную дату размещения в календаре блогера и оплатите заказ</p>
+                        <div class="step-icon">
+                            <i data-lucide="calendar"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Отслеживайте результат</h3>
+                        <p>Получайте статистику по просмотрам, кликам и конверсии в разделе "Профиль"</p>
+                        <div class="step-icon">
+                            <i data-lucide="bar-chart"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tips-section">
+                    <h3>
+                        <i data-lucide="lightbulb"></i>
+                        Полезные советы
+                    </h3>
+                    <div class="tips-list">
+                        <div class="tip-item">
+                            <i data-lucide="check-circle"></i>
+                            <span>Изучите аудиторию блогера перед заказом</span>
+                        </div>
+                        <div class="tip-item">
+                            <i data-lucide="check-circle"></i>
+                            <span>Подготовьте качественный контент для рекламы</span>
+                        </div>
+                        <div class="tip-item">
+                            <i data-lucide="check-circle"></i>
+                            <span>Используйте A/B тестирование для разных форматов</span>
+                        </div>
+                        <div class="tip-item">
+                            <i data-lucide="check-circle"></i>
+                            <span>Анализируйте результаты для улучшения ROI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Page -->
+        <div class="page" id="chat-page">
+            <div class="page-header">
+                <h2>Чаты</h2>
+                <p class="page-subtitle">Ваши диалоги</p>
+            </div>
+            <div class="chats-list" id="chats-list">
+                <!-- Chats will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-page="buy">
+                <i data-lucide="store" class="nav-icon"></i>
+                <span class="nav-label">Buy</span>
+            </button>
+            <button class="nav-btn" data-page="profile">
+                <i data-lucide="user-circle" class="nav-icon"></i>
+                <span class="nav-label">Profile</span>
+            </button>
+            <button class="nav-btn" data-page="chat">
+                <span class="nav-icon nav-icon-chat" aria-hidden="true"></span>
+                <span class="nav-label">Chat</span>
+            </button>
+            <button class="nav-btn" data-page="offer">
+                <span class="nav-icon nav-icon-offer" aria-hidden="true"></span>
+                <span class="nav-label">Offer</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Premium Emoji Post Modal -->
+    <div class="modal-overlay" id="premium-emoji-modal-overlay" onclick="closePremiumEmojiModal()">
+        <div class="orders-modal" id="premium-emoji-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closePremiumEmojiModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="orders-empty-state">
+                    <div class="empty-icon">
+                        <i data-lucide="message-square-text" style="width: 64px; height: 64px; color: var(--primary-color);"></i>
+                    </div>
+                    <h3>Отправьте пост боту</h3>
+                    <p style="margin-bottom: 24px;">
+                        Отправьте боту текст рекламного поста в чате.<br>
+                        Вы можете форматировать слова, добавлять ссылки, использовать премиум-эмодзи.<br>
+                        Для прикрепления фото, добавьте к сообщению до 5 картинок.
+                    </p>
+                    <div class="premium-emoji-actions" style="display: flex; gap: 12px; width: 100%; margin-top: 24px;">
+                        <button class="btn-oval secondary" style="flex: 1;" onclick="closePremiumEmojiModal()">
+                            Назад
+                        </button>
+                        <button class="btn-oval primary" id="premium-continue-btn" style="flex: 1; opacity: 0.5; pointer-events: none;" onclick="continuePremiumPost()" disabled>
+                            Продолжить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders History Modal -->
+    <div class="modal-overlay" id="orders-modal-overlay" onclick="closeOrdersModal()">
+        <div class="orders-modal" id="orders-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeOrdersModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="orders-empty-state">
+                    <div class="empty-icon">
+                        <div id="modal-animation-orders"></div>
+                    </div>
+                    <h3>Пока нет заказов</h3>
+                    <p>Ваши заказы будут отображаться здесь после их создания</p>
+                    <button class="btn-primary" onclick="closeOrdersModal(); switchToPage('buy')">
+                        <i data-lucide="plus"></i>
+                        Создать первый заказ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Ads Modal -->
+    <div class="modal-overlay" id="active-ads-modal-overlay" onclick="closeActiveAdsModal()">
+        <div class="orders-modal" id="active-ads-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeActiveAdsModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="orders-empty-state">
+                    <div class="empty-icon">
+                        <div id="modal-animation-ads"></div>
+                    </div>
+                    <h3>Нет активной рекламы</h3>
+                    <p>Ваши активные рекламные кампании будут отображаться здесь</p>
+                    <button class="btn-primary" onclick="closeActiveAdsModal(); switchToPage('buy')">
+                        <i data-lucide="plus"></i>
+                        Запустить рекламу
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blogger Application Modal -->
+    <div class="modal-overlay" id="blogger-application-modal-overlay" onclick="closeBloggerApplicationModal()">
+        <div class="orders-modal" id="blogger-application-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeBloggerApplicationModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="orders-empty-state blogger-form-state">
+                    <div class="empty-icon">
+                        <div id="modal-animation-blogger"></div>
+                    </div>
+                    <h3>Присоединяйтесь к нам</h3>
+                    <p>Начните зарабатывать со своим каналом</p>
+                    <form id="blogger-application-form" class="blogger-form" onsubmit="submitBloggerApplication(event)" novalidate>
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input 
+                                    type="url" 
+                                    id="channel-link" 
+                                    name="channel_link" 
+                                    class="form-input" 
+                                    placeholder="https://t.me/your_channel"
+                                    required
+                                >
+                                <button type="submit" class="input-send-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="send" class="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>
+                                </button>
+                            </div>
+                            <span class="form-hint">Укажите ссылку на ваш telegram канал.</span>
+                        </div>
+                    </form>
+                </div>
+                <!-- Instructions Block (hidden by default) -->
+                <div class="blogger-instructions-state" id="blogger-instructions" style="display: none;">
+                    <div class="instructions-content">
+                        <h3 class="instructions-title">Добавьте бота <a href="https://t.me/admarket_testbot" target="_blank" class="bot-username">@admarket_testbot</a> администратором в канал.</h3>
+                        <div class="instructions-list">
+                            <p class="instruction-item">Выдайте права на отправку сообщений</p>
+                            <p class="instruction-item">Не забирайте права администратора у бота.</p>
+                        </div>
+                        <button class="btn-verify" onclick="verifyBloggerChannel()">
+                            <i data-lucide="check-circle"></i>
+                            Проверить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blogger Detail Modal -->
+    <div class="modal-overlay" id="blogger-detail-modal-overlay" onclick="closeBloggerModal()">
+        <div class="blogger-detail-modal" id="blogger-detail-modal" onclick="event.stopPropagation()">
+            <div class="blogger-modal-header">
+                <button class="modal-close-btn" onclick="closeBloggerModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="blogger-modal-content">
+                <!-- Blogger Image with Info Overlay -->
+                <div class="blogger-modal-image">
+                    <img id="blogger-modal-img" src="" alt="Блогер">
+                    <div class="blogger-modal-image-overlay"></div>
+                    
+                    <!-- Blogger Info on Image -->
+                    <div class="blogger-modal-info">
+                        <div class="blogger-modal-header-row">
+                            <h2 class="blogger-modal-name" id="blogger-modal-name">@channel</h2>
+                            <span class="blogger-modal-subscribers" id="blogger-modal-subscribers">0</span>
+                        </div>
+                        
+                        <p class="blogger-modal-price" id="blogger-modal-price">0 ₽</p>
+                    </div>
+                    
+                    <!-- Floating Chat Button -->
+                    <button class="blogger-modal-chat-btn" onclick="handleChat()">
+                        <i data-lucide="message-circle"></i>
+                    </button>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="blogger-modal-actions">
+                    <button class="blogger-modal-btn blogger-modal-btn-secondary" onclick="handleMakeOffer()">
+                        <span>Сделать оффер</span>
+                    </button>
+                    <button class="blogger-modal-btn blogger-modal-btn-primary" onclick="handleBuyAd()">
+                        <span>Купить рекламу</span>
+                    </button>
+                </div>
+                
+                <!-- Reviews Section -->
+                <div class="blogger-modal-reviews" id="blogger-modal-reviews-container">
+                    <div class="blogger-modal-reviews-empty" id="blogger-reviews-empty">
+                        У блогера нет отзывов
+                    </div>
+                    <div class="blogger-reviews-list" id="blogger-reviews-list">
+                        <!-- Reviews will be loaded here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal-overlay" onclick="closeSettingsModal()">
+        <div class="orders-modal settings-modal" id="settings-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeSettingsModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="settings-content">
+                    <!-- Language Selection -->
+                    <div class="settings-section">
+                        <div class="settings-section-header">
+                            <i data-lucide="languages"></i>
+                            <h3>ЯЗЫК</h3>
+                        </div>
+                        <div class="language-options">
+                            <button class="language-btn active" data-lang="ru" onclick="changeLanguage('ru')">
+                                <span class="language-flag">🇷🇺</span>
+                                <span class="language-name">RU</span>
+                                <i data-lucide="check" class="language-check"></i>
+                            </button>
+                            <button class="language-btn" data-lang="en" onclick="changeLanguage('en')">
+                                <span class="language-flag">🇬🇧</span>
+                                <span class="language-name">EN</span>
+                                <i data-lucide="check" class="language-check"></i>
+                            </button>
+                            <button class="language-btn" data-lang="uk" onclick="changeLanguage('uk')">
+                                <span class="language-flag">🇺🇦</span>
+                                <span class="language-name">UA</span>
+                                <i data-lucide="check" class="language-check"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Referral System Button -->
+                    <div class="settings-section">
+                        <button class="settings-referral-btn" onclick="openReferralModal()">
+                            <i data-lucide="users"></i>
+                            <span>Реферальная система</span>
+                        </button>
+                    </div>
+
+                    <!-- Vibration Toggle -->
+                    <div class="settings-section">
+                        <div class="settings-section-header">
+                            <i data-lucide="smartphone"></i>
+                            <h3>ВИБРАЦИЯ</h3>
+                        </div>
+                        <div class="settings-toggle-row">
+                            <span class="settings-toggle-label">Вибрация</span>
+                            <div class="toggle-switch active" id="vibration-toggle" onclick="toggleVibration(this)">
+                                <div class="toggle-switch-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agreement and Privacy Buttons -->
+                    <div class="settings-section settings-section-spaced">
+                        <div class="settings-buttons-row">
+                            <button class="settings-gray-btn" onclick="openAgreementModal()">
+                                Соглашение
+                            </button>
+                            <button class="settings-gray-btn" onclick="openPrivacyModal()">
+                                Конфиденциальность
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Actions -->
+                    <div class="settings-bottom-actions">
+                        <button class="settings-action-btn" onclick="openFAQ()">
+                            <i data-lucide="help-circle"></i>
+                            <span>FAQ</span>
+                        </button>
+                        <button class="settings-action-btn primary" onclick="openSupport()">
+                            <i data-lucide="headphones"></i>
+                            <span>Поддержка</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referral System Modal -->
+    <div class="modal-overlay" id="referral-modal-overlay" onclick="closeReferralModal()">
+        <div class="orders-modal referral-modal" id="referral-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeReferralModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="referral-content">
+                    <div class="referral-modal-link-wrapper">
+                        <span class="referral-modal-link-text" id="referral-modal-link-text">t.me/admarket_testbot/apptest</span>
+                        <button class="referral-modal-copy-btn" type="button" onclick="copyReferralModalLink()">
+                            <i data-lucide="clipboard"></i>
+                        </button>
+                    </div>
+
+                    <div class="referral-summary">
+                        <span class="referral-summary-label">У вас рефералов:</span>
+                        <span class="referral-summary-value" id="referral-count">0</span>
+                    </div>
+
+                    <div class="referral-list" id="referral-list">
+                        <!-- Referral items will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agreement Modal -->
+    <div class="modal-overlay" id="agreement-modal-overlay" onclick="closeAgreementModal()">
+        <div class="orders-modal agreement-modal" id="agreement-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeAgreementModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="agreement-content">
+                    <h2 class="agreement-title">Пользовательское соглашение</h2>
+                    <div class="agreement-text">
+                        <p>Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует отношения между 4 MILLION ADS («мы», «наш» или «нас») и пользователем («Продавец», «покупатель») при использовании платформы для размещения рекламы в Telegram-каналах.</p>
+                        
+                        <h3>1. Общие положения</h3>
+                        <p>1.1. Используя платформу, вы подтверждаете, что ознакомились с условиями Соглашения и Политикой конфиденциальности 4 MILLION ADS.</p>
+                        <p>1.2. Соглашение регулирует порядок регистрации, использования функционала платформы и взаимодействия с ботом.</p>
+                        
+                        <h3>2. Регистрация и учетная запись</h3>
+                        <p>2.1. Для использования платформы необходимо <strong>войти через ваш личный Telegram-аккаунт и привязать свой канал.</strong></p>
+                        <p>2.2. Вы не передаете никакие другие данные при регистрации, кроме указанного аккаунта и привязки канала.</p>
+                        <p>2.3. 4 MILLION ADS обязуется сохранять все ваши данные конфиденциальными и не передавать их третьим лицам.</p>
+                        
+                        <h3>3. Использование платформы и бота</h3>
+                        <p>3.1. Для размещения рекламы пользователи добавляют нашего бота в свой Telegram-канал как администратора.</p>
+                        <p>3.2. Бот может публиковать и удалять посты только в рамках оплаченных реклам.</p>
+                        <p>3.3. Бот не имеет доступа к личным сообщениям, другим администраторам или другим данным канала.</p>
+                        <p>3.4. Ваши контакты в чатах остаются анонимными и защищены, их невозможно обойти.</p>
+                        
+                        <h3>4. Оплата и услуги</h3>
+                        <p>4.1. Оплата рекламы производится через платформу Юкасса.</p>
+                        <p>4.2. Вы оплачиваете услуги платформы согласно тарифам, доступным на сайте.</p>
+                        <p>4.3. Вывод средств производится в течение 24 часов после окончания рекламной кампании на банковскую карту, указанную при регистрации.</p>
+                        <p>4.4. Возврат средств возможен только до запуска рекламной кампании. После публикации поста возврат невозможен.</p>
+                        
+                        <h3>5. Ограничения и запрещенные материалы</h3>
+                        <p>5.1. На платформе 4 MILLION ADS запрещена реклама:</p>
+                        <ul>
+                            <li>политического характера</li>
+                            <li>18+ контента</li>
+                            <li>казино, азартных игр и любых сомнительных финансовых схем</li>
+                        </ul>
+                        <p>5.2. Нарушение этих правил приводит к немедленной блокировке учетной записи в нашем боте и отмене вывода средств.</p>
+                        <p>5.3. В случае публикации запрещенных материалов, рекламный пост удаляется автоматически, а средства передаются блогеру без возможности возврата покупателю.</p>
+                        
+                        <h3>6. Конфиденциальность и данные</h3>
+                        <p>6.1. Мы не передаем и не продаем ваши контакты третьим лицам.</p>
+                        <p>6.2. Если ваши контакты где-либо появились без нашего участия, мы не несем за это ответственность.</p>
+                        <p>6.3. Данные используются только для работы платформы 4 MILLION ADS и обеспечения рекламных кампаний.</p>
+                        
+                        <h3>7. Ответственность</h3>
+                        <p>7.1. 4 MILLION ADS не несет ответственность за содержимое рекламных материалов, предоставленных пользователем.</p>
+                        <p>7.2. Бот действует только в рамках оплаченной рекламы и не использует данные канала для иных целей.</p>
+                        <p>7.3. Пользователь несет ответственность за соблюдение правил платформы и законодательства.</p>
+                        
+                        <h3>8. Прекращение использования</h3>
+                        <p>8.1. 4 MILLION ADS может приостанавливать или блокировать аккаунт пользователя в нашем боте при нарушении условий Соглашения.</p>
+                        <p>8.2. Вы можете удалить нашего бота и прекратить использование платформы в любое время.</p>
+                        
+                        <h3>9. Изменения Соглашения</h3>
+                        <p>9.1. 4 MILLION ADS оставляет за собой право вносить изменения в Соглашение.</p>
+                        <p>9.2. Новая редакция вступает в силу после публикации на платформе.</p>
+                        <p>9.3. Продолжение использования платформы после обновления означает согласие с изменениями.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal-overlay" id="privacy-modal-overlay" onclick="closePrivacyModal()">
+        <div class="orders-modal privacy-modal" id="privacy-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closePrivacyModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="privacy-content">
+                    <h2 class="privacy-title">Политика конфиденциальности</h2>
+                    <div class="privacy-text">
+                        <p>Настоящая Политика конфиденциальности описывает, как 4 MILLION ADS («мы», «наш» или «нас») собирает, использует, хранит и защищает информацию пользователей нашей платформы для размещения и управления рекламой в Telegram-каналах. Используя нашу платформу, вы соглашаетесь с условиями настоящей Политики.</p>
+                        
+                        <h3>1. Информация, которую мы собираем</h3>
+                        <h4>а. Персональная информация</h4>
+                        <ul>
+                            <li>Имя и идентификаторы в Telegram</li>
+                            <li>Контактная информация, если предоставляется добровольно (например, e-mail для поддержки)</li>
+                            <li>Номер банковской карты, необходимый для вывода средств с платформы</li>
+                        </ul>
+                        
+                        <h4>b. Данные о каналах</h4>
+                        <ul>
+                            <li>Доступ к каналу через нашего бота, который будет добавлен как администратор</li>
+                            <li>Бот может публиковать и удалять посты только в рамках оплаченных рекламных кампаний</li>
+                            <li>Бот не имеет доступа к личным сообщениям, другим администраторам или другим данным канала</li>
+                        </ul>
+                        
+                        <h4>c. Неперсональная информация</h4>
+                        <ul>
+                            <li>IP-адрес, тип устройства, операционная система, браузер</li>
+                            <li>Взаимодействие с платформой и действия в личном кабинете</li>
+                            <li>Статистика размещений рекламы (охваты, клики, CTR) — может быть агрегирована и обезличена</li>
+                        </ul>
+                        
+                        <h3>2. Цели использования информации</h3>
+                        <ul>
+                            <li>Оказание и управление рекламными кампаниями в Telegram-каналах</li>
+                            <li>Автоматическое размещение постов через бота только после оплаты рекламы</li>
+                            <li>Обеспечение корректной работы платформы и статистики</li>
+                            <li>Связь с пользователями для поддержки, уведомлений и обновлений</li>
+                            <li>Соблюдение требований законодательства</li>
+                        </ul>
+                        
+                        <h3>3. Хранение и защита данных</h3>
+                        <ul>
+                            <li>Все данные хранятся на защищенных серверах и доступны только уполномоченным сотрудникам</li>
+                            <li>Мы используем технические и организационные меры для защиты данных</li>
+                            <li>Несмотря на меры защиты, 100% безопасность не гарантирована</li>
+                        </ul>
+                        
+                        <h3>4. Обмен и передача данных</h3>
+                        <ul>
+                            <li>Мы не продаем ваши данные третьим лицам</li>
+                            <li>Мы можем передавать данные только в рамках работы платформы:
+                                <ul>
+                                    <li>Платежным системам (для оплаты и вывода средств)</li>
+                                    <li>Правоохранительным органам при наличии законного запроса</li>
+                                </ul>
+                            </li>
+                            <li>Данные о канале и действия бота используются только для автоматического размещения рекламы и не передаются третьим лицам</li>
+                        </ul>
+                        
+                        <h3>5. Ваши права</h3>
+                        <ul>
+                            <li>Получить доступ к вашим данным</li>
+                            <li>Исправить или обновить информацию</li>
+                            <li>Попросить удалить ваши данные (с учетом обязательств по отчетности и финансовым операциям)</li>
+                            <li>Отозвать согласие на обработку данных, если оно было дано ранее</li>
+                        </ul>
+                        <p>Для реализации этих прав свяжитесь с нашей службой поддержки: @fourmillion_sup</p>
+                        
+                        <h3>6. Изменения в Политике конфиденциальности</h3>
+                        <ul>
+                            <li>Мы оставляем за собой право обновлять Политику</li>
+                            <li>Изменения вступают в силу с момента публикации на платформе</li>
+                            <li>Рекомендуем периодически проверять страницу политики, чтобы быть в курсе изменений</li>
+                        </ul>
+                        
+                        <p><strong>💡 Ключевой момент:</strong> бот работает только с каналом и только в рамках оплаченной рекламы, других данных мы не используем, кроме банковской карты для выплат.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Balance Topup Modal -->
+    <div class="modal-overlay" id="balance-topup-modal-overlay" onclick="closeBalanceTopupModal()">
+        <div class="orders-modal" id="balance-topup-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="wallet-icon-btn" onclick="event.stopPropagation(); openWalletModal()">
+                    <img src="/static/pic/free-icon-wallet-272595.png" alt="Wallet">
+                </button>
+                <button class="modal-close-btn" onclick="closeBalanceTopupModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="topup-content">
+                    <div class="topup-header">
+                        <div class="topup-icon">
+                            <img src="/static/pic/free-icon-ruble-2769409.png" alt="₽">
+                        </div>
+                        <h3 class="topup-title">Пополнение баланса</h3>
+                        <p class="topup-description">Выберите сумму пополнения и подтвердите оплату</p>
+                    </div>
+                    <!-- Amount Input -->
+                    <div class="topup-amount-section">
+                        <div class="amount-input-wrapper">
+                            <input 
+                                type="number" 
+                                id="topup-amount" 
+                                placeholder="Укажите сумму в рублях" 
+                                min="1" 
+                                max="100000"
+                                step="1"
+                                class="amount-input"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Buttons -->
+                    <div class="payment-buttons">
+                        <button class="btn-secondary ton-button" onclick="handleTonPayment()">
+                            TON
+                        </button>
+                        <button class="btn-primary yukassa-button" onclick="handleBalanceTopup()">
+                            ЮКасса
+                        </button>
+                    </div>
+                    
+                    <!-- Payment History Link -->
+                    <button class="payment-history-link" onclick="showPaymentHistory()">
+                        История платежей
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment History Modal -->
+    <div id="payment-history-container" class="modal-overlay" style="display: none;" onclick="closePaymentHistory()">
+        <!-- Content will be dynamically loaded -->
+    </div>
+
+    <!-- Wallet Modal -->
+    <div class="modal-overlay" id="wallet-modal-overlay" onclick="closeWalletModal()">
+        <div class="orders-modal" id="wallet-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeWalletModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="wallet-content">
+                    <div class="wallet-header">
+                        <div class="wallet-icon">
+                            <img src="/static/pic/free-icon-wallet-272595.png" alt="Wallet">
+                        </div>
+                        <h3 class="wallet-title">TON Кошелек</h3>
+                    </div>
+                    
+                    <!-- Connected State -->
+                    <div class="wallet-connected-state" id="wallet-connected-state" style="display: none;">
+                        <div class="wallet-address-section">
+                            <label class="wallet-label">Адрес кошелька</label>
+                            <div class="wallet-address-field" id="wallet-address-field" onclick="copyWalletAddress()">
+                                <span id="wallet-address-text">Загрузка...</span>
+                                <button class="wallet-copy-btn" onclick="event.stopPropagation(); copyWalletAddress()">
+                                    <i data-lucide="copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="wallet-buttons">
+                            <button class="btn-secondary wallet-btn" onclick="disconnectTonWallet()">
+                                Отключить
+                            </button>
+                            <button class="btn-primary wallet-btn" onclick="handleWalletWithdraw()">
+                                Вывод
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Disconnected State -->
+                    <div class="wallet-disconnected-state" id="wallet-disconnected-state">
+                        <p class="wallet-message">Вы не подключили TON кошелек</p>
+                        <button class="btn-primary wallet-connect-btn" onclick="connectTonWallet()">
+                            Подключить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal-overlay" id="withdraw-modal-overlay" onclick="closeWithdrawModal()">
+        <div class="orders-modal" id="withdraw-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeWithdrawModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="withdraw-content">
+                    <div class="withdraw-header">
+                        <div class="withdraw-icon">
+                            <img src="/static/pic/free-icon-wallet-272595.png" alt="Wallet">
+                        </div>
+                        <h3 class="withdraw-title">Вывод средств</h3>
+                    </div>
+                    
+                    <!-- Balance Display -->
+                    <div class="withdraw-balance-section">
+                        <label class="withdraw-label">Доступно для вывода</label>
+                        <div class="withdraw-balance-display">
+                            <span id="withdraw-balance-amount">0</span>
+                            <img src="/static/pic/free-icon-ruble-12718476.png" alt="₽" class="withdraw-ruble-icon">
+                        </div>
+                    </div>
+                    
+                    <!-- Wallet Address Input -->
+                    <div class="withdraw-field-section">
+                        <label class="withdraw-label">Адрес кошелька TON</label>
+                        <input 
+                            type="text" 
+                            id="withdraw-wallet-address" 
+                            class="withdraw-input" 
+                            placeholder="Введите адрес кошелька"
+                            readonly
+                        />
+                    </div>
+                    
+                    <!-- Amount Input -->
+                    <div class="withdraw-field-section">
+                        <label class="withdraw-label">Сумма вывода</label>
+                        <div class="withdraw-amount-wrapper">
+                            <input 
+                                type="number" 
+                                id="withdraw-amount-input" 
+                                class="withdraw-input" 
+                                placeholder="0"
+                                min="1"
+                                step="1"
+                            />
+                            <span class="withdraw-currency">₽</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="withdraw-buttons">
+                        <button class="btn-secondary withdraw-btn" onclick="closeWithdrawModal()">
+                            Назад
+                        </button>
+                        <button class="btn-primary withdraw-btn" onclick="submitWithdrawRequest()">
+                            Подтвердить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div class="modal-overlay" id="purchase-modal-overlay" onclick="closePurchaseModal()">
+        <div class="orders-modal" id="purchase-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closePurchaseModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content" id="purchase-modal-content">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Post Creation Modal (шаг 2: текст + фото) -->
+    <div class="modal-overlay" id="post-creation-modal-overlay" onclick="closePostCreationModal()">
+        <div class="post-creation-modal" id="post-creation-modal" onclick="event.stopPropagation()">
+            <!-- Верхняя часть: карточка изображения поста -->
+            <div class="post-creation-image-card" id="post-creation-image-card" onclick="triggerPostImagesUpload()">
+                <div class="post-creation-image-placeholder" id="post-creation-placeholder">
+                    <div class="post-creation-placeholder-icon">
+                        <i data-lucide="image-plus"></i>
+                    </div>
+                    <p class="post-creation-placeholder-text">Нажмите для загрузки фото</p>
+                </div>
+                <div class="post-creation-images-grid" id="post-creation-images-grid"></div>
+                <div class="post-creation-images-note" id="post-creation-images-note" style="display: none;"></div>
+                <input 
+                    type="file" 
+                    id="post-creation-file-input" 
+                    accept="image/*" 
+                    multiple 
+                    style="display: none;" 
+                    onchange="handlePostImagesSelected(event)"
+                >
+            </div>
+            
+            <div class="post-creation-header" style="display: flex !important; flex-direction: row !important; align-items: flex-start !important; justify-content: space-between !important; gap: 16px !important; margin-bottom: 12px !important; margin-top: 12px !important; padding: 0 16px !important;">
+                <div class="post-creation-header-left" style="display: flex !important; flex-direction: column !important; gap: 4px !important; flex: 1 !important;">
+                    <h3 class="post-creation-title" style="margin: 0 !important;">Оформление поста</h3>
+                    <p class="post-creation-subtitle" style="margin: 0 !important;">Напишите текст и добавьте изображения для размещения</p>
+                </div>
+                <div class="post-creation-header-right" style="display: flex !important; flex-direction: column !important; align-items: center !important; flex-shrink: 0 !important;">
+                    <button class="premium-emoji-btn" type="button" onclick="handlePremiumEmojiClick()">
+                        <img src="/static/pic/free-icon-chat-bot-13334236.png" alt="Премиум эмодзи" class="premium-emoji-icon">
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Средняя часть: текст поста -->
+            <div class="post-creation-text-wrapper" id="post-creation-text-wrapper">
+                <div class="post-creation-text-error" id="post-creation-text-error">
+                    Максимальное количество символов с фото: 950
+                </div>
+                <textarea 
+                    id="post-creation-text" 
+                    class="post-creation-textarea" 
+                    placeholder="Текст рекламного поста, промокод, ссылка и другие детали..."
+                    maxlength="4000"
+                ></textarea>
+                <div class="post-creation-char-counter" id="post-creation-char-counter">
+                    0 / 4000
+                </div>
+            </div>
+            
+            <!-- Нижняя часть: кнопки действий -->
+            <div class="post-creation-actions">
+                <button 
+                    class="btn-oval secondary" 
+                    type="button" 
+                    onclick="backToTimeSelection()"
+                >
+                    Назад
+                </button>
+                <button 
+                    class="btn-oval primary" 
+                    type="button" 
+                    onclick="submitPostPurchase()"
+                >
+                    Продолжить
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Day Picker Modal for Purchase -->
+    <div class="modal-overlay" id="day-picker-modal-overlay" onclick="closeDayPickerModal()">
+        <div class="day-picker-modal" id="day-picker-modal" onclick="event.stopPropagation()">
+            <div class="day-picker-header">
+                <h3 class="day-picker-title">Выберите день публикации</h3>
+            </div>
+            
+            <div class="day-picker-content">
+                <div class="week-calendar day-picker-week-calendar" id="day-picker-week-calendar">
+                    <!-- Дни недели будут сгенерированы через JS -->
+                </div>
+            </div>
+
+            <!-- Time picker line in the same style as schedule modal -->
+            <div class="time-range-slider-container day-picker-time-container" id="day-picker-time-container">
+                <div class="time-range-header">
+                    <span class="time-range-day-label" id="day-picker-day-label">Понедельник</span>
+                </div>
+                
+                <div class="time-range-controls">
+                    <div class="time-display-wrapper">
+                        <input
+                            type="text"
+                            id="day-picker-time-display"
+                            class="time-display-input"
+                            value="00:00"
+                            inputmode="numeric"
+                            pattern="\\d{2}:\\d{2}"
+                            placeholder="00:00"
+                        >
+                    </div>
+
+                    <!-- Лимиты времени по краям ползунка -->
+                    <div class="day-picker-time-labels">
+                        <span class="day-picker-time-limit" id="day-picker-time-min-label">00:00</span>
+                        <span class="day-picker-time-limit" id="day-picker-time-max-label">23:59</span>
+                    </div>
+
+                    <div class="dual-slider-wrapper">
+                        <div class="dual-slider-track">
+                            <div class="dual-slider-range" id="day-picker-slider-range"></div>
+                        </div>
+                        <input
+                            type="range"
+                            id="day-picker-time-slider"
+                            class="dual-slider-input"
+                            min="0"
+                            max="1439"
+                            value="0"
+                            step="1"
+                        >
+                    </div>
+                </div>
+            </div>
+            
+            <div class="schedule-actions day-picker-actions">
+                <button class="schedule-action-btn secondary" type="button" onclick="closeDayPickerModal()">
+                    <i data-lucide="x"></i>
+                    <span>Отмена</span>
+                </button>
+                <button class="schedule-action-btn primary" type="button" onclick="saveSelectedDayForPurchase()">
+                    <i data-lucide="check"></i>
+                    <span>Сохранить</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blogger Card Modal -->
+    <div class="modal-overlay" id="blogger-card-modal-overlay" onclick="closeBloggerCardModal()">
+        <div class="blogger-detail-modal" id="blogger-card-modal" onclick="event.stopPropagation()">
+            <div class="blogger-modal-header">
+                <button class="modal-close-btn" onclick="closeBloggerCardModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="blogger-modal-content">
+                <!-- Blogger Image with Info Overlay -->
+                <div class="blogger-modal-image" id="blogger-card-image-container">
+                    <img id="blogger-card-img" src="" alt="Фото блогера" class="blogger-photo-preview">
+                    <div class="blogger-photo-placeholder" id="blogger-photo-placeholder" onclick="triggerPhotoUpload()">
+                        <div class="placeholder-icon">
+                            <i data-lucide="camera"></i>
+                        </div>
+                        <p class="placeholder-text">Нажмите для загрузки фото</p>
+                    </div>
+                    <div class="blogger-modal-image-overlay"></div>
+                    
+                    <!-- Blogger Info on Image -->
+                    <div class="blogger-modal-info">
+                        <div class="blogger-modal-header-row">
+                            <h2 class="blogger-modal-name" id="blogger-card-channel">@channel</h2>
+                            <span class="blogger-modal-subscribers" id="blogger-card-subscribers">0</span>
+                        </div>
+                        
+                        <!-- Editable Price -->
+                        <div class="blogger-modal-price-wrapper">
+                            <div class="blogger-modal-price-row">
+                                <p class="blogger-modal-price" id="blogger-card-price" onclick="editPriceInline('12h')">
+                                    <span class="price-value">0</span> <span class="price-label">/ 12 часов</span>
+                                </p>
+                                <p class="blogger-modal-price-permanent" id="blogger-card-price-permanent" onclick="editPriceInline('permanent')">
+                                    <span class="price-value-permanent">0</span> <span class="price-label">/ без удаления</span>
+                                </p>
+                            </div>
+                            <div class="blogger-modal-price-edit" id="blogger-card-price-edit" style="display: none;">
+                                <input type="text" id="blogger-price-inline-input" class="form-input price-inline-input" placeholder="10000">
+                                <span class="price-edit-label" id="price-edit-label-text">/ 12 часов</span>
+                                <div class="price-edit-buttons">
+                                    <button type="button" class="price-edit-btn save" onclick="savePriceInline()">
+                                        <i data-lucide="check"></i>
+                                    </button>
+                                    <button type="button" class="price-edit-btn cancel" onclick="cancelPriceInline()">
+                                        <i data-lucide="x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Edit Form -->
+                <div class="blogger-card-edit-form">
+                    <div class="settings-toggle-row">
+                        <span class="settings-toggle-label">Статус карточки</span>
+                        <div class="toggle-switch active" id="card-status-toggle" onclick="toggleCardStatus(this)">
+                            <div class="toggle-switch-slider"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="schedule-btn" type="button">
+                        <img src="/static/pic/free-icon-calendar-7269814.png" alt="Календарь" class="schedule-btn-icon">
+                        <span>График постов</span>
+                    </button>
+                    
+                    <div class="channel-actions-row">
+                        <button class="delete-channel-btn" type="button" onclick="deleteFirstChannel()">
+                            <i data-lucide="trash-2"></i>
+                            <span>Удалить</span>
+                        </button>
+                        
+                        <button class="add-channel-btn" type="button" onclick="addNewChannel()">
+                            <i data-lucide="plus"></i>
+                            <span>Добавить</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Blogger Channels List -->
+                    <div id="blogger-channels-list" class="blogger-channels-list">
+                        <!-- Channels will be rendered here -->
+                    </div>
+                    
+                    <input type="file" id="blogger-photo-upload" accept="image/*" style="display: none;" onchange="uploadBloggerPhoto(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Modal (График постов) -->
+    <div class="modal-overlay" id="schedule-modal-overlay" onclick="closeScheduleModal()">
+        <div class="schedule-modal" id="schedule-modal" onclick="event.stopPropagation()">
+            <div class="schedule-modal-header">
+                <h3 class="schedule-modal-title">График постов</h3>
+                <button class="schedule-modal-close" onclick="closeScheduleModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="schedule-modal-content">
+                <p class="schedule-hint">
+                    *Зажмите день недели, чтобы настроить доступное время для рекламных постов
+                </p>
+                <div class="week-calendar" id="week-calendar">
+                    <!-- Week days will be generated here -->
+                </div>
+
+                <!-- Time range slider (appears below week buttons on long press) -->
+                <div class="time-range-slider-container" id="time-range-slider-container" style="display: none;">
+                    <div class="time-range-header">
+                        <span class="time-range-day-label" id="time-range-day-label">Понедельник</span>
+                    </div>
+                    
+                    <div class="time-range-controls">
+                        <div class="time-display-wrapper">
+                            <input 
+                                type="text" 
+                                id="time-from-display" 
+                                class="time-display-input" 
+                                value="00:00"
+                                inputmode="numeric"
+                                pattern="\\d{2}:\\d{2}"
+                                placeholder="00:00"
+                            >
+                            <span class="time-separator">—</span>
+                            <input 
+                                type="text" 
+                                id="time-to-display" 
+                                class="time-display-input" 
+                                value="23:59"
+                                inputmode="numeric"
+                                pattern="\\d{2}:\\d{2}"
+                                placeholder="23:59"
+                            >
+                        </div>
+                        
+                        <div class="dual-slider-wrapper">
+                            <div class="dual-slider-track">
+                                <div class="dual-slider-range" id="dual-slider-range"></div>
+                            </div>
+                            <input 
+                                type="range" 
+                                id="slider-from" 
+                                class="dual-slider-input slider-from" 
+                                min="0" 
+                                max="1439" 
+                                value="0"
+                                step="1"
+                            >
+                            <input 
+                                type="range" 
+                                id="slider-to" 
+                                class="dual-slider-input slider-to" 
+                                min="0" 
+                                max="1439" 
+                                value="1439"
+                                step="1"
+                            >
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="schedule-actions">
+                    <button class="schedule-action-btn secondary" onclick="closeScheduleModal()">
+                        <i data-lucide="x"></i>
+                        <span>Отмена</span>
+                    </button>
+                    <button class="schedule-action-btn primary" onclick="saveSchedule()">
+                        <i data-lucide="check"></i>
+                        <span>Сохранить</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Channel Settings Modal (Настройки канала) -->
+    <div class="modal-overlay" id="channel-settings-modal-overlay" onclick="closeChannelSettingsModal()">
+        <div class="blogger-detail-modal" id="channel-settings-modal" onclick="event.stopPropagation()">
+            <div class="blogger-modal-header">
+                <button class="modal-close-btn" onclick="closeChannelSettingsModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="blogger-modal-content">
+                <!-- Channel Image with Info Overlay -->
+                <div class="blogger-modal-image" id="channel-settings-image-container">
+                    <img id="channel-settings-img" src="" alt="Фото канала" class="blogger-photo-preview">
+                    <div class="blogger-photo-placeholder" id="channel-photo-placeholder" onclick="triggerChannelPhotoUpload()">
+                        <div class="placeholder-icon">
+                            <i data-lucide="camera"></i>
+                        </div>
+                        <div class="placeholder-text">Загрузить фото</div>
+                    </div>
+                    <div class="blogger-modal-image-overlay"></div>
+                    
+                    <!-- Channel Info on Image -->
+                    <div class="blogger-modal-info">
+                        <div class="blogger-modal-header-row">
+                            <h2 class="blogger-modal-name" id="channel-settings-name">@channel</h2>
+                            <span class="blogger-modal-subscribers" id="channel-settings-subscribers">0</span>
+                        </div>
+                        
+                        <!-- Editable Price -->
+                        <div class="blogger-modal-price-wrapper">
+                            <div class="blogger-modal-price-row">
+                                <p class="blogger-modal-price" id="channel-settings-price" onclick="editChannelPriceInline('12h')">
+                                    <span class="price-value">0</span> <span class="price-label">₽ / 12 часов</span>
+                                </p>
+                                <p class="blogger-modal-price" id="channel-settings-price-permanent" onclick="editChannelPriceInline('permanent')">
+                                    <span class="price-value-permanent">Укажите цену</span> <span class="price-label">/ без удаления</span>
+                                </p>
+                            </div>
+                            <div class="blogger-modal-price-edit" id="channel-settings-price-edit" style="display: none;">
+                                <input type="text" id="channel-price-inline-input" class="form-input price-inline-input" placeholder="10000">
+                                <span class="price-edit-label" id="channel-price-edit-label-text">₽ / 12 часов</span>
+                                <div class="price-edit-buttons">
+                                    <button type="button" class="price-edit-btn save" onclick="saveChannelPriceInline()">
+                                        <i data-lucide="check"></i>
+                                    </button>
+                                    <button type="button" class="price-edit-btn cancel" onclick="cancelChannelPriceInline()">
+                                        <i data-lucide="x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Channel Settings Form -->
+                <div class="blogger-card-edit-form">
+                    <div class="settings-toggle-row">
+                        <span class="settings-toggle-label">Статус канала</span>
+                        <div class="toggle-switch active" id="channel-status-toggle" onclick="toggleChannelStatus(this)">
+                            <div class="toggle-switch-slider"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="schedule-btn" type="button" onclick="openChannelScheduleModal()">
+                        <img src="/static/pic/free-icon-calendar-7269814.png" alt="Календарь" class="schedule-btn-icon">
+                        <span>График постов</span>
+                    </button>
+                    
+                    <div class="channel-actions-row">
+                        <button class="delete-channel-btn" type="button" onclick="deleteChannel()">
+                            <i data-lucide="trash-2"></i>
+                            <span>Удалить</span>
+                        </button>
+                        
+                        <button class="add-channel-btn" type="button" onclick="addNewChannel()">
+                            <i data-lucide="plus"></i>
+                            <span>Добавить</span>
+                        </button>
+                    </div>
+                    
+                    <input type="file" id="channel-photo-upload" accept="image/*" style="display: none;" onchange="uploadChannelPhoto(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div class="modal-overlay" id="chat-modal-overlay" onclick="closeChatModal()">
+        <div class="chat-modal" id="chat-modal" onclick="event.stopPropagation()">
+            <!-- Floating Blogger Name Badge -->
+            <div class="chat-blogger-badge" id="chat-blogger-name">
+                @channel
+                <span class="chat-connection-status" id="chat-connection-status" title="Подключение..."></span>
+            </div>
+            <!-- Channel Avatar (only for bloggers) -->
+            <img id="chat-channel-avatar" class="chat-channel-avatar" src="" alt="Channel" style="display: none;">
+
+            <!-- Messages Container -->
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be loaded here -->
+            </div>
+
+            <!-- Message Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input 
+                        type="text" 
+                        id="chat-message-input" 
+                        class="chat-input" 
+                        placeholder="Введите сообщение"
+                        maxlength="250"
+                    >
+                    <button class="chat-send-btn" onclick="sendChatMessage()">
+                        <i data-lucide="send"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer Modal (оффер к конкретному блогеру) -->
+    <div class="modal-overlay" id="offer-modal-overlay" onclick="closeOfferModal()">
+        <div class="orders-modal" id="offer-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeOfferModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="offer-content">
+                    <!-- Channel info -->
+                    <div class="offer-channel-card">
+                        <div class="offer-channel-image-wrapper">
+                            <img id="offer-channel-img" src="" alt="Канал" class="offer-channel-img">
+                        </div>
+                        <div class="offer-channel-info">
+                            <h3 class="offer-channel-name" id="offer-channel-name">@channel</h3>
+                            <div class="offer-channel-meta">
+                                <span class="offer-channel-subscribers" id="offer-channel-subscribers">0 подписчиков</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current price -->
+                    <div class="offer-price-section">
+                        <label class="input-label">Текущая цена</label>
+                        <div class="offer-current-price" id="offer-current-price">0 ₽</div>
+                    </div>
+
+                    <!-- Offered price input -->
+                    <div class="offer-price-section">
+                        <label class="input-label" for="offer-price-input">Ваше предложение</label>
+                        <div class="amount-input-wrapper">
+                            <input 
+                                type="number" 
+                                id="offer-price-input" 
+                                class="amount-input" 
+                                placeholder="Введите сумму" 
+                                min="1" 
+                                step="1"
+                                inputmode="numeric"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="offer-actions">
+                        <button 
+                            class="btn-oval secondary" 
+                            type="button" 
+                            onclick="backFromOffer()"
+                        >
+                            Назад
+                        </button>
+                        <button 
+                            class="btn-oval primary" 
+                            type="button" 
+                            onclick="submitOffer()"
+                        >
+                            Продолжить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Offer Creation Step 1: контент (фото + текст) -->
+    <div class="modal-overlay" id="offer-post-modal-overlay" onclick="closeOfferPostModal()">
+        <div class="post-creation-modal" id="offer-post-modal" onclick="event.stopPropagation()">
+            <!-- Верхняя часть: карточка изображений предложения -->
+            <div class="post-creation-image-card" id="offer-post-image-card" onclick="triggerOfferImagesUpload()">
+                <div class="post-creation-image-placeholder" id="offer-post-placeholder">
+                    <div class="post-creation-placeholder-icon">
+                        <i data-lucide="image-plus"></i>
+                    </div>
+                    <p class="post-creation-placeholder-text">Нажмите для загрузки до 5 фото</p>
+                </div>
+                <div class="post-creation-images-grid" id="offer-post-images-grid"></div>
+                <div class="post-creation-images-note" id="offer-post-images-note" style="display: none;"></div>
+                <input 
+                    type="file" 
+                    id="offer-post-file-input" 
+                    accept="image/*" 
+                    multiple 
+                    style="display: none;" 
+                    onchange="handleOfferImagesSelected(event)"
+                >
+            </div>
+            
+            <div class="post-creation-header">
+                <h3 class="post-creation-title">Описание предложения</h3>
+                <p class="post-creation-subtitle">Добавьте фото и опишите суть рекламного предложения</p>
+            </div>
+            
+            <!-- Средняя часть: текст предложения -->
+            <div class="post-creation-text-wrapper" id="offer-post-text-wrapper">
+                <div class="post-creation-text-error" id="offer-post-text-error">
+                    Максимальное количество символов с фото: 950
+                </div>
+                <textarea 
+                    id="offer-post-text" 
+                    class="post-creation-textarea" 
+                    placeholder="Опишите вашу идею поста, ключевые сообщения, ссылки, промокоды..."
+                    maxlength="4000"
+                ></textarea>
+                <div class="post-creation-char-counter" id="offer-post-char-counter">
+                    0 / 4000
+                </div>
+            </div>
+            
+            <!-- Нижняя часть: кнопки действий -->
+            <div class="post-creation-actions">
+                <button 
+                    class="btn-oval secondary" 
+                    type="button" 
+                    onclick="closeOfferPostModal()"
+                >
+                    Назад
+                </button>
+                <button 
+                    class="btn-oval primary" 
+                    type="button" 
+                    onclick="continueOfferToSettings()"
+                >
+                    Продолжить
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Offer Creation Step 2: настройки (цена, тематика, срок) -->
+    <div class="modal-overlay" id="offer-settings-modal-overlay" onclick="closeOfferSettingsModal()">
+        <div class="orders-modal" id="offer-settings-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeOfferSettingsModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="offer-settings-content">
+                    <div class="offer-settings-header">
+                        <h3 class="offer-settings-title">Настройка предложения</h3>
+                        <p class="offer-settings-subtitle">Укажите стоимость и параметры размещения</p>
+                    </div>
+                    
+                    <!-- Цена за час -->
+                    <div class="offer-settings-block">
+                        <label class="input-label" for="offer-hour-price-input">Цена за час</label>
+                        <div class="amount-input-wrapper">
+                            <input 
+                                type="number" 
+                                id="offer-hour-price-input" 
+                                class="amount-input"
+                                placeholder="Например, 500"
+                                min="1"
+                                step="1"
+                                inputmode="numeric"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- Тематика -->
+                    <div class="offer-settings-block">
+                        <label class="input-label">Тематика:</label>
+                        <div class="offer-topic-select" id="offer-topic-select" onclick="toggleOfferTopicsDropdown()">
+                            <span id="offer-topic-selected">Выберите тематику</span>
+                            <i data-lucide="chevron-down" class="offer-topic-icon"></i>
+                        </div>
+                        <div class="offer-topics-dropdown" id="offer-topics-dropdown">
+                            <div class="offer-topics-menu" id="offer-topics-menu">
+                                <!-- Topics will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Срок поста -->
+                    <div class="offer-settings-block">
+                        <label class="input-label">Срок поста</label>
+                        <p class="offer-settings-hint">Выберите, сколько часов пост будет находиться в ленте</p>
+                        <div class="time-slider-wrapper offer-duration-wrapper">
+                            <div class="time-slider-display">
+                                <span id="offer-duration-hours">1</span>
+                                <span class="hours-label">часов</span>
+                            </div>
+                            <div class="slider-container">
+                                <input 
+                                    type="range" 
+                                    class="time-slider" 
+                                    id="offer-duration-slider" 
+                                    min="1" 
+                                    max="24" 
+                                    value="1" 
+                                    step="1"
+                                >
+                                <div class="slider-labels">
+                                    <span>1ч</span>
+                                    <span>24ч</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Кнопки действий -->
+                    <div class="offer-settings-actions">
+                        <button 
+                            class="btn-oval secondary" 
+                            type="button" 
+                            onclick="backFromOfferSettingsToContent()"
+                        >
+                            Назад
+                        </button>
+                        <button 
+                            class="btn-oval primary" 
+                            type="button" 
+                            onclick="submitOfferCreation()"
+                        >
+                            Продолжить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer: not-a-blogger info modal -->
+    <div class="modal-overlay" id="offer-not-blogger-modal-overlay" onclick="closeOfferNotBloggerModal()">
+        <div class="orders-modal" id="offer-not-blogger-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="modal-close-btn" onclick="closeOfferNotBloggerModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="orders-empty-state">
+                    <div class="empty-icon">
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <h3>Вы не можете продавать посты</h3>
+                    <p>Вы не можете продавать посты, так как не являетесь блогером.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer preview modal (для блогера, шаг 1: просмотр предложения) -->
+    <div class="modal-overlay" id="offer-preview-modal-overlay" onclick="closeOfferPreviewModal()">
+        <div class="blogger-detail-modal offer-preview-modal" id="offer-preview-modal" onclick="event.stopPropagation()">
+            <div class="blogger-modal-header">
+                <button class="modal-close-btn" onclick="closeOfferPreviewModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="blogger-modal-content">
+                <!-- Верхняя картинка в стиле карточки блогера -->
+                <div class="blogger-modal-image">
+                    <img id="offer-preview-img" src="" alt="Превью оффера">
+                    <div class="blogger-modal-image-overlay"></div>
+                    
+                    <div class="blogger-modal-info">
+                        <div class="blogger-modal-header-row">
+                            <h2 class="blogger-modal-name" id="offer-preview-title">0 ₽</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Текст поста под картинкой -->
+                <div class="offer-preview-text-block">
+                    <p class="offer-preview-text" id="offer-preview-text"></p>
+                </div>
+
+                <!-- Кнопки действий внизу карточки -->
+                <div class="blogger-modal-actions">
+                    <button class="blogger-modal-btn blogger-modal-btn-secondary" onclick="closeOfferPreviewModal()">
+                        <span>Назад</span>
+                    </button>
+                    <button class="blogger-modal-btn blogger-modal-btn-primary" id="offer-preview-action-btn" onclick="continueFromOfferPreview()">
+                        <span>Продолжить</span>
+                    </button>
+                    <button class="blogger-modal-btn blogger-modal-btn-delete" id="offer-delete-btn" style="display: none;" onclick="deleteOffer()">
+                        <span>Удалить оффер</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offer publication scheduling modal (для блогеров) -->
+    <div class="modal-overlay" id="offer-publication-modal-overlay" onclick="closeOfferPublicationModal()">
+        <div class="day-picker-modal" id="offer-publication-modal" onclick="event.stopPropagation()">
+            <div class="day-picker-header">
+                <h3 class="day-picker-title">Выберите день публикации</h3>
+            </div>
+
+            <div class="day-picker-content">
+                <div class="week-calendar day-picker-week-calendar" id="offer-publication-week-calendar">
+                    <!-- Дни недели будут сгенерированы через JS -->
+                </div>
+            </div>
+
+            <div class="time-range-slider-container day-picker-time-container" id="offer-publication-time-container">
+                <div class="time-range-header">
+                    <span class="time-range-day-label" id="offer-publication-day-label">Понедельник</span>
+                </div>
+
+                <div class="time-range-controls">
+                    <div class="time-display-wrapper">
+                        <input
+                            type="text"
+                            id="offer-publication-time-display"
+                            class="time-display-input"
+                            value="00:00"
+                            inputmode="numeric"
+                            pattern="\\d{2}:\\d{2}"
+                            placeholder="00:00"
+                        >
+                    </div>
+
+                    <div class="day-picker-time-labels">
+                        <span class="day-picker-time-limit" id="offer-publication-time-min-label">00:00</span>
+                        <span class="day-picker-time-limit" id="offer-publication-time-max-label">23:59</span>
+                    </div>
+
+                    <div class="dual-slider-wrapper">
+                        <div class="dual-slider-track">
+                            <div class="dual-slider-range" id="offer-publication-slider-range"></div>
+                        </div>
+                        <input
+                            type="range"
+                            id="offer-publication-time-slider"
+                            class="dual-slider-input"
+                            min="0"
+                            max="1439"
+                            value="0"
+                            step="1"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div class="schedule-actions day-picker-actions">
+                <button class="schedule-action-btn secondary" type="button" onclick="closeOfferPublicationModal()">
+                    <i data-lucide="x"></i>
+                    <span>Назад</span>
+                </button>
+                <button class="schedule-action-btn primary" type="button" onclick="submitOfferPublicationTime()">
+                    <i data-lucide="check"></i>
+                    <span>Предложить публикацию</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Channel Verification Modal -->
+    <div class="modal-overlay" id="channel-verification-modal-overlay" onclick="closeChannelVerificationModal()">
+        <div class="channel-verification-modal" onclick="event.stopPropagation()">
+            <div class="channel-verification-header">
+                <h3 class="channel-verification-title">Подтверждение канала</h3>
+                <button class="modal-close-btn" onclick="closeChannelVerificationModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="channel-verification-content">
+                <div class="verification-icon">
+                    <i data-lucide="shield-check"></i>
+                </div>
+                
+                <p class="verification-text">
+                    Добавьте бота <strong>@admarket_testbot</strong> в канал как администратора с правами на отправку сообщений
+                </p>
+                
+                <button class="verify-btn" onclick="verifyChannel()">
+                    Проверить
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- XSS Protection - загружается ПЕРВЫМ -->
+    <script src="{{ url_for('static', filename='js/app_xss_patch.js') }}?v={{ static_v }}"></script>
+    <script src="{{ url_for('static', filename='js/schedule.js') }}?v={{ static_v }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v={{ static_v }}"></script>
+    <script src="{{ url_for('static', filename='js/payment.js') }}?v={{ static_v }}"></script>
+    
+    <!-- TON Connect SDK - загружаем с обработкой ошибок -->
+    <script>
+        // Проверяем загрузку TON Connect UI
+        window.tonConnectLoaded = false;
+        window.tonConnectError = null;
+    </script>
+    <script 
+        src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"
+        onload="window.tonConnectLoaded = true; console.log('✅ TON Connect UI загружен');"
+        onerror="window.tonConnectError = 'Ошибка загрузки TON Connect UI'; console.error('❌ Ошибка загрузки TON Connect UI');"
+    ></script>
+    <script 
+        src="https://unpkg.com/@ton/core@0.56.0/dist/index.js"
+        onload="window.TonCore = TonCore; console.log('✅ TON Core загружен');"
+        onerror="console.error('❌ Ошибка загрузки TON Core');"
+    ></script>
+    <script src="{{ url_for('static', filename='js/tonconnect.js') }}?v={{ static_v }}"></script>
+    
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
